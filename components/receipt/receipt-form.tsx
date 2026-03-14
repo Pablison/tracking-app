@@ -1,3 +1,5 @@
+import { CheckCircle2 } from "lucide-react";
+
 interface ReceiptFormProps {
   isSubmitting: boolean;
   nameError: boolean;
@@ -117,9 +119,7 @@ export function ReceiptForm({
             <span className="text-sm tracking-wide sm:text-[16px]">
               SIM, RECEBI A MERCADORIA
             </span>
-            <span className="text-xl transition-transform duration-300 group-hover:scale-125">
-              +
-            </span>
+            <CheckCircle2 className="h-5 w-5 flex-shrink-0 transition-transform duration-300 group-hover:scale-125 sm:h-6 sm:w-6" />
           </>
         )}
       </button>
