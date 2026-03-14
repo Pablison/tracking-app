@@ -1,0 +1,15 @@
+providers = ["node"]
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "nodePackages.pnpm"]
+cmds = ["corepack enable"]
+
+[phases.install]
+cmds = ["pnpm install --prefer-offline"]
+
+[phases.build]
+cmds = ["pnpm run build"]
+cacheDirectories = [".next/cache"]
+
+[start]
+cmd = "pnpm run start"
