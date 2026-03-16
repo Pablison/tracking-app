@@ -29,9 +29,7 @@ function buildApiUrl(baseUrl: string): string {
     ? baseUrl.slice(0, -1)
     : baseUrl;
 
-  const path = normalizedBaseUrl.endsWith("/rest")
-    ? "/api/ft/v1/romaneios/receipt"
-    : "/rest/api/ft/v1/romaneios/receipt";
+  const path = "/api/ft/v1/romaneios/receipt";
 
   return `${normalizedBaseUrl}${path}`;
 }
