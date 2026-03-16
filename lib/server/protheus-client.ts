@@ -10,6 +10,20 @@ interface ProtheusConfig {
   authorization: string;
 }
 
+function sanitizeUrlForLog(url: string): string {
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.searchParams.has("token")) {
+      parsedUrl.searchParams.set("token", "***");
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return url.replace(/token=[^&]+/i, "token=***");
+  }
+}
+
 function buildApiUrl(baseUrl: string): string {
   const normalizedBaseUrl = baseUrl.endsWith("/")
     ? baseUrl.slice(0, -1)
@@ -28,6 +42,11 @@ function getProtheusConfig(): ProtheusConfig {
   const baseUrl = process.env.PROTHEUS_REST_URL;
 
   if (!user || !password || !baseUrl) {
+    console.error("[protheus] Missing environment variables.", {
+      hasUser: Boolean(user),
+      hasPassword: Boolean(password),
+      hasBaseUrl: Boolean(baseUrl),
+    });
     throw new Error("Protheus environment variables are missing.");
   }
 
@@ -53,24 +72,70 @@ async function parseJsonResponse<T>(response: Response): Promise<T | null> {
   }
 }
 
+async function fetchWithProtheusLogs(
+  input: string,
+  init: RequestInit,
+): Promise<Response> {
+  const startedAt = Date.now();
+  const method = init.method ?? "GET";
+  const sanitizedUrl = sanitizeUrlForLog(input);
+
+  console.info("[protheus] Starting request.", {
+    url: sanitizedUrl,
+    method,
+  });
+
+  try {
+    const response = await fetch(input, init);
+
+    console.info("[protheus] Request completed.", {
+      url: sanitizedUrl,
+      method,
+      status: response.status,
+      durationMs: Date.now() - startedAt,
+    });
+
+    return response;
+  } catch (error) {
+    console.error("[protheus] Request failed.", {
+      url: sanitizedUrl,
+      method,
+      durationMs: Date.now() - startedAt,
+      error,
+    });
+
+    throw error;
+  }
+}
+
 export async function getRomaneioByToken(token: string): Promise<{
   status: number;
   data?: RomaneioData;
   message?: string;
 }> {
   const { apiUrl, authorization } = getProtheusConfig();
+  const requestUrl = `${apiUrl}?token=${encodeURIComponent(token)}`;
 
-  const response = await fetch(`${apiUrl}?token=${encodeURIComponent(token)}`, {
-    method: "GET",
-    headers: {
-      Authorization: authorization,
+  const response = await fetchWithProtheusLogs(
+    requestUrl,
+    {
+      method: "GET",
+      headers: {
+        Authorization: authorization,
+      },
+      cache: "no-store",
     },
-    cache: "no-store",
-  });
+  );
 
   const payload = await parseJsonResponse<ProtheusResponse>(response);
 
   if (!response.ok) {
+    console.error("[protheus] ERP returned error for romaneio query.", {
+      url: sanitizeUrlForLog(requestUrl),
+      status: response.status,
+      message: payload?.message ?? null,
+    });
+
     return {
       status: response.status,
       message: payload?.message || "Erro retornado pelo ERP.",
@@ -91,18 +156,27 @@ export async function confirmReceipt(
 }> {
   const { apiUrl, authorization } = getProtheusConfig();
 
-  const response = await fetch(apiUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: authorization,
+  const response = await fetchWithProtheusLogs(
+    apiUrl,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authorization,
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   const responseBody = await parseJsonResponse<ProtheusResponse>(response);
 
   if (!response.ok) {
+    console.error("[protheus] ERP returned error for receipt confirmation.", {
+      url: sanitizeUrlForLog(apiUrl),
+      status: response.status,
+      message: responseBody?.message ?? null,
+    });
+
     return {
       status: response.status,
       message: responseBody?.message || "Erro retornado pelo ERP.",
