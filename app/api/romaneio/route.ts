@@ -26,6 +26,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(result.data, { status: result.status });
   } catch (error) {
     console.error("Erro ao consultar romaneio no Protheus:", error);
+    console.error("Detalhes /api/romaneio:", {
+      hasUrl: Boolean(process.env.PROTHEUS_REST_URL),
+      hasUser: Boolean(process.env.PROTHEUS_REST_USER),
+      hasPass: Boolean(process.env.PROTHEUS_REST_PASS),
+    });
 
     return NextResponse.json(
       { message: "Erro de comunicacao com os servidores." },
