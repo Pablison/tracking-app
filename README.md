@@ -10,19 +10,19 @@ Este sistema permite o acompanhamento do romaneio desde a criação até a confi
 
 1. **Criar/Separar Romaneio:** É gerado o romaneio e realizada a separação dos itens.
    
-   ![Expedição - Romaneios Pendentes](./public/tela_romaneio.png)
+   ![Expedição - Romaneios Pendentes](./public/img/tracking-app/tela_romaneio.png)
 
 2. **Despacho do Romaneio:** Após separação, registra-se o despacho ao destinatário, notificando seu e-mail.
    
-   ![Despacho de Romaneio](./public/tela_despacho.png)
+   ![Despacho de Romaneio](./public/img/tracking-app/tela_despacho.png)
 
 3. **Notificação por E-mail:** O destinatário recebe um e-mail com um token único para confirmação.
    
-   ![Notificação de Envio](./public/e-mail_destinatario.png)
+   ![Notificação de Envio](./public/img/tracking-app/e-mail_destinatario.png)
 
 4. **Confirmação de Recebimento:** O destinatário acessa a tela, valida os itens recebidos, confirma e o token é apagado (prevenindo duplicidade de confirmação).
    
-   ![Confirmação de Entrega](./public/spa_confirm.png)
+   ![Confirmação de Entrega](./public/img/tracking-app/spa_confirm.png)
 
 ---
 
