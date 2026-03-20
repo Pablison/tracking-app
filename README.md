@@ -9,6 +9,8 @@ server-side com o Protheus.
 - React 19
 - TypeScript
 - Tailwind CSS 4
+- API Rest
+- Sql Server
 
 ## Executando localmente
 
@@ -49,18 +51,3 @@ lib/
   types/                 -> contratos do dominio
   utils/                 -> utilitarios puros
 ```
-
-## Decisoes de refatoracao
-
-- A integracao com o ERP foi centralizada em `lib/server/protheus-client.ts`.
-- A sanitizacao de token e a formatacao de data foram extraidas para utilitarios.
-- `app/page.tsx` deixou de concentrar regra, layout e efeitos colaterais.
-- A tela foi quebrada em componentes menores, com responsabilidades explicitas.
-- As rotas de API agora validam entrada e delegam a logica de infraestrutura.
-
-## Proximos passos recomendados
-
-- Adicionar testes para `sanitizeToken`, `formatDeliveryDate` e rotas de API.
-- Criar validacao estruturada de payload com Zod ou schema equivalente.
-- Mapear mensagens de erro do Protheus para mensagens de negocio mais claras.
-- Considerar observabilidade minima nas rotas com logs padronizados.
