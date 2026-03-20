@@ -28,10 +28,7 @@ function buildApiUrl(baseUrl: string): string {
   const normalizedBaseUrl = baseUrl.endsWith("/")
     ? baseUrl.slice(0, -1)
     : baseUrl;
-
-  const path = "/api/ft/v1/romaneios/receipt";
-
-  return `${normalizedBaseUrl}${path}`;
+  return `${normalizedBaseUrl}/api/ft/v1/romaneios/receipt`;
 }
 
 function getProtheusConfig(): ProtheusConfig {
@@ -78,22 +75,8 @@ async function fetchWithProtheusLogs(
   const method = init.method ?? "GET";
   const sanitizedUrl = sanitizeUrlForLog(input);
 
-  console.info("[protheus] Starting request.", {
-    url: sanitizedUrl,
-    method,
-  });
-
   try {
-    const response = await fetch(input, init);
-
-    console.info("[protheus] Request completed.", {
-      url: sanitizedUrl,
-      method,
-      status: response.status,
-      durationMs: Date.now() - startedAt,
-    });
-
-    return response;
+    return await fetch(input, init);
   } catch (error) {
     console.error("[protheus] Request failed.", {
       url: sanitizedUrl,
